@@ -1,8 +1,11 @@
 body{
-    width: 25vw;
-    height: 25vh;
+    width: 450px;
+    height: 450px;
+    background-color: bisque;
 }
 
-.pop_extension_container{
-    font-size: 1.5em;
+.text_class{
+    font-size: 1.2em;
+    font-weight: 120;
+    font-family: Arial, Helvetica, sans-serif;
 }
