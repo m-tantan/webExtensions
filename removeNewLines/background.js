@@ -1,11 +1,8 @@
-console.log("Background script up and running");
-
 chrome.runtime.onMessage.addListener(receiver);
 
 window.selectedText = "";
 
 function receiver(request, sender, response){
-    console.log(request["text"]);
     
     let processedText = transformText(request["text"]);
     

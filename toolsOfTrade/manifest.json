@@ -1,0 +1,34 @@
+{
+    "manifest_version": 2,
+    "name": "Share bookmarks",
+    "version": "0.1",
+    "description": "Share a bookmark folder",
+    "icons": {
+      "16": "content/scholarship_16.png",
+      "48": "content/scholarship_32.png",
+      "96": "content/scholarship_32.png"
+    },
+  
+    "content_scripts": [{
+        "matches": [
+            "<all_urls>"
+        ],
+        "js": [
+            "sharing.js" 
+        ]
+    }],
+    "permissions": [
+          "contextMenus",
+          "bookmarks"
+        ],
+    "browser_action": {
+        "default_icon": "content/scholarship_16.png",
+        "default_title": "Remove new lines",
+        "default_popup": "index.html"
+      },
+  
+    "background": {
+      "scripts": ["background.js"]
+    }
+  
+  }
