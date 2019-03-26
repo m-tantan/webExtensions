@@ -1,0 +1,32 @@
+body {
+    width: 450px;
+    height: 450px;
+}
+
+.big-box {
+    line-break: normal;
+    overflow: auto;
+}
+
+.btn-proceed {
+    display: flex;
+    width: auto;
+    position: relative;
+    background-color: darkblue;
+    color: whitesmoke;
+    text-align: center;
+}
+
+.btn-reset {
+    display: flex;
+    width: auto;
+}
+
+.flex-row-container {
+    display: flex;
+}
+
+.flex-row-spacer-btns {
+    display: flex;
+    flex: 3 1 150px;
+}

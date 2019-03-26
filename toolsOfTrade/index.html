@@ -1,12 +1,45 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <script src="bookmarks_popup.js" type="text/javascript"></script>
-        <link rel="stylesheet" href="bookmarks_style.css">
-        <title>Tools of trade!</title>
-    </head>
-    <body>
-        <h2 class="popup_header">Choose a bookmark folder to share</h2>
-    </body>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="bookmarks_popup.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="bookmarks_style.css">
+    <title>Tools of trade!</title>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1 class="display-1">Sharing is caring</h1>
+
+        <!-- Select action to use URLs with -->
+        <div class="form-check">
+            <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue"> Open as
+                tabs
+            </label>
+            <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue">
+                Save as bookmark folder
+            </label>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="">Input the urls seperated by commas here</label>
+            <br>
+            <textarea class="form-control big-box" name="UrlBox" cols="60" rows="20" id="inputBox" placeholder="Paste urls here"></textarea>
+            <br>
+        </div>
+
+        <div class="flex-row-container">
+            <input name="cleanUrls" id="clearBtn" class="btn btn-primary btn-reset" type="button" value="Reset">
+            <p class="flex-row-spacer-btns"></p>
+            <input name="recieveUrls" id="btnInput" class="btn btn-primary btn-proceed" type="button" value="Proceed">
+        </div>
+
+    </div>
+
+</body>
+
 </html>

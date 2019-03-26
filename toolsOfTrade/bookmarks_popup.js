@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
   // Used to get the children within a folder with a known Id
   var fetchPromiseChildren = chrome.bookmarks.getChildren("243", onFetchBookmarkSuccess);
-
-
   if (activated) {
     chrome.bookmarks.create({
       'title': "Folder",
@@ -43,6 +41,7 @@ function onFetchBookmarkSuccess(bookmarks) {
     // });
   });
 }
+
 function onFetchBookmarkFail(err) {
   console.log(`Err: ${err}`);
 }
