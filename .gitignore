@@ -3,3 +3,7 @@
 ################################################################################
 
 /toolsOfTrade/node_modules
+/toolsOfTrade/.vs
+/toolsOfTrade.pem
+/toolsOfTrade.crx
+/toolsOfTrade/package-lock.json
