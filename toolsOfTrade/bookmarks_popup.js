@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
         var catAsStr = cat.toString();
         chrome.bookmarks.get([catAsStr], onFetchBookmarkSuccess);
       });
+
     }
     else if (mode == OPEN_AS_TABS) { 
       var unparsedUrlsToOpen = urlTextArea.value;
@@ -128,13 +129,19 @@ function onFetchBookmarkSuccess(bookmarks) {
 }
 
 function onGetChildrenSuccess(children){
+  // var listOfFolderNames = [];
+  // var listOfFolderIds = [];
+  var foldersDict = {};
   children.forEach((child)=> {
     if (child.url == null){
       console.log(`Found folder: ${child.title}`)
+      // listOfFolderNames.add(child.title);
+      // listOfFolderIds.add(child.id);
+      foldersDict[child.title] = child.id;
     }
-
   })
-  // console.log(children);
+  
+  return foldersDict;
 }
 
 function onFetchBookmarkFail(err) {
