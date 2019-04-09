@@ -12,10 +12,10 @@ const GET_CURRENT_BOOKMARK_FOLDERS = 1;
 const OPEN_AS_TABS = 2;
 const SAVE_URLS_TO_BOOKMARK_FOLDER = 3;
 
-
+// Pre-script preparation 
 var mode = INITIALIZE;
-// Gets the background script code, can access window variables from here
-let bgPage = chrome.extension.getBackgroundPage();
+const generalListOfBookmarks = [BOOKMARKS_BAR, OTHER_BOOKMARKS_FOLDER, MOBILE_BOOKMARKS]
+let bgPage = chrome.extension.getBackgroundPage();  // Gets the background script code, can access window variables from here
 
 // Waits for the popup to load. Code goes in here
 document.addEventListener('DOMContentLoaded', function (event) {
@@ -66,7 +66,10 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     // If user wishes to open several links together
     if (mode == GET_CURRENT_BOOKMARK_FOLDERS || mode == INITIALIZE){
-
+      generalListOfBookmarks.forEach(cat => {
+        var catAsStr = cat.toString();
+        chrome.bookmarks.get([catAsStr], onFetchBookmarkSuccess);
+      });
     }
     else if (mode == OPEN_AS_TABS) { 
       var unparsedUrlsToOpen = urlTextArea.value;
@@ -78,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
       }
     }
     else if (mode == SAVE_URLS_TO_BOOKMARK_FOLDER){
-      
+    
     }
   };
 
@@ -108,8 +111,8 @@ function createUrlWithin(newBookmark) {
   });
 }
 
-const generalListOfBookmarks = [BOOKMARKS_BAR, OTHER_BOOKMARKS_FOLDER, MOBILE_BOOKMARKS]
 var listOfBookmarks = [];
+
 function getAllBookmarks() {
   generalListOfBookmarks.forEach(cat => {
 
@@ -119,10 +122,19 @@ function getAllBookmarks() {
 function onFetchBookmarkSuccess(bookmarks) {
   bookmarks.forEach(element => {
     console.log(element);
-    // element.forEach(elem => {
-    //   console.log(`I'm a child ${elem.child}`)
-    // });
+    console.log(element.id);
+    chrome.bookmarks.getChildren(element.id, onGetChildrenSuccess)
   });
+}
+
+function onGetChildrenSuccess(children){
+  children.forEach((child)=> {
+    if (child.url == null){
+      console.log(`Found folder: ${child.title}`)
+    }
+
+  })
+  // console.log(children);
 }
 
 function onFetchBookmarkFail(err) {
