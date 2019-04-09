@@ -3,6 +3,7 @@ var activated = false;
 
 /* -------------------- CONSTANTS -------------------*/
 // List of available containers for bookmarks to iterate over
+// 0 root, 1 bar (bookmarksBar.id [not working]), 2 other, 3 mobile
 const BOOKMARKS_BAR = 1;
 const OTHER_BOOKMARKS_FOLDER = 2;
 const MOBILE_BOOKMARKS = 3;
@@ -14,8 +15,11 @@ const SAVE_URLS_TO_BOOKMARK_FOLDER = 3;
 
 // Pre-script preparation 
 var mode = INITIALIZE;
+var parentFolderId = BOOKMARKS_BAR;
 const generalListOfBookmarks = [BOOKMARKS_BAR, OTHER_BOOKMARKS_FOLDER, MOBILE_BOOKMARKS]
 let bgPage = chrome.extension.getBackgroundPage();  // Gets the background script code, can access window variables from here
+var tabsToOpenList = [];
+var linksToSaveList = [];
 
 // Waits for the popup to load. Code goes in here
 document.addEventListener('DOMContentLoaded', function (event) {
@@ -25,8 +29,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
   var urlTextArea = document.getElementById("urlInputBox");
   var clearBtn = document.getElementById("clearBtn");
   var proceedBtn = document.getElementById("proceedBtn");
+  var bookmarkBarRadio = document.getElementById("intoBookmarkBar");
+  var otherBookmarksRadio = document.getElementById("intoOtherFolder");
   var urlTextGuidance = document.getElementById("guidanceText");
   var radioButtons = document.getElementsByClassName("form-check-input");
+  var newFolderInputText = document.getElementById("folderNameId");
+  var newFolderNameInput = document.getElementById("folderNameInput");
 
   // 'Define' radio buttons 
   const shareFoldersRadio = radioButtons[0];
@@ -39,13 +47,19 @@ document.addEventListener('DOMContentLoaded', function (event) {
     console.log("Will get all bookmarks");
     urlTextArea.classList.add("hideElem");
     urlTextGuidance.classList.add("hideElem");
-    document.body.style.height = '135px';
+    newFolderInputText.classList.add("hideElem");
+    newFolderNameInput.classList.add("hideElem");
+
+    document.body.style.height = '140px';
   };
   openAsTabsRadio.onclick = function (ev) {
     mode = OPEN_AS_TABS;
     console.log("Copied all active tabs");
     urlTextArea.classList.remove("hideElem");
     urlTextGuidance.classList.remove("hideElem");
+    newFolderInputText.classList.add("hideElem");
+    newFolderNameInput.classList.add("hideElem");
+    
     document.body.style.height = '450px';
   };
   importNewFolderFromUrlRadio.onclick = function (ev) {
@@ -53,12 +67,24 @@ document.addEventListener('DOMContentLoaded', function (event) {
     console.log("Creating a new bookmark folder from given links");
     urlTextArea.classList.remove("hideElem");
     urlTextGuidance.classList.remove("hideElem");
-    document.body.style.height = '450px';
+    newFolderInputText.classList.remove("hideElem");
+    newFolderNameInput.classList.remove("hideElem");
+    document.body.style.height = '460px';
   };
 
   // Set up buttons' onclick here
   clearBtn.onclick = function (ev) {
     console.log("Deleting textarea content");
+  };
+
+  bookmarkBarRadio.onclick = function(ev) {
+    parentFolderId = BOOKMARKS_BAR;
+    console.log(`Select BookmarkBar`);
+  };
+
+  otherBookmarksRadio.onclick = function(ev) {
+    parentFolderId = OTHER_BOOKMARKS_FOLDER;
+    console.log(`Select Other bookmark folder`);
   };
 
   proceedBtn.onclick = function (ev) {
@@ -75,40 +101,62 @@ document.addEventListener('DOMContentLoaded', function (event) {
     else if (mode == OPEN_AS_TABS) { 
       var unparsedUrlsToOpen = urlTextArea.value;
       var parsedUrlsToOpen = unparsedUrlsToOpen.split("\n");
-      for (i = 0; i < parsedUrlsToOpen.length; i++) {
-        website = parsedUrlsToOpen[i];
-        console.log("Opening new tab with: ", website);
-        chrome.tabs.create({ 'url': website });
+      if (unparsedUrlsToOpen.length > 0){
+        for (i = 0; i < parsedUrlsToOpen.length; i++) {
+          website = parsedUrlsToOpen[i];
+          console.log("Opening new tab with: ", website);
+          chrome.tabs.create({ 'url': website });
+        }
       }
     }
-    else if (mode == SAVE_URLS_TO_BOOKMARK_FOLDER){
-    
+    else if (mode == SAVE_URLS_TO_BOOKMARK_FOLDER){ // If Create a folder was selected
+      var unparsedUrlsToOpen = urlTextArea.value;
+      if (unparsedUrlsToOpen.length > 0){
+        var parsedUrlsToOpen = unparsedUrlsToOpen.split("\n");
+
+        for (i = 0; i < parsedUrlsToOpen.length; i++) {
+          website = parsedUrlsToOpen[i];
+          console.log("Saving new bookmark: ", website);
+        }
+        linksToSaveList = parsedUrlsToOpen;
+        chrome.bookmarks.create({
+          'title': newFolderNameInput.value.toString(),
+          'index': 0,
+          'parentId': parentFolderId.toString()
+        }, createUrlsWithin);
+        
+      }
     }
   };
 
-  // 0 root, 1 bar (bookmarksBar.id [not working]), 2 other, 3 mobile
   // Used to fetch a folder / single url
-  var fetchPromiseFolder = chrome.bookmarks.get(["255"], onFetchBookmarkSuccess);
-
+  
   // // Used to get the children within a folder with a known Id
-  var fetchPromiseChildren = chrome.bookmarks.getChildren("255", onFetchBookmarkSuccess);
   if (activated) {
+    var fetchPromiseChildren = chrome.bookmarks.getChildren("255", onFetchBookmarkSuccess);
+    var fetchPromiseFolder = chrome.bookmarks.get(["255"], onFetchBookmarkSuccess);
     chrome.bookmarks.create({
       'title': "Folder",
       'index': 0,
       'parentId': "0"
-    }, createUrlWithin);
+    }, createUrlsWithin);
   }
 })
 
-function createUrlWithin(newBookmark) {
-  console.log("added bookmark with name: " + newBookmark.title);
-  console.log("In general, the bookmark object is this: ", newBookmark);
+function createUrlsWithin(newBookmarkFolder, listOfLinks) {
+  console.log("added bookmark folder with name: " + newBookmarkFolder.title);
+  console.log("In general, the bookmark object is this: ", newBookmarkFolder);
+  console.log(`listOfLinks: ${listOfLinks}`)
+  linksToSaveList.forEach( (link) => {
+    var getNameRegex = /^https?:\/\/(www)?\.?([\w]*).*$/gm;
+    var matches = getNameRegex.exec(link);
+    var urlName = matches[2];
+    chrome.bookmarks.create({
+      'title': urlName,
+      'url': link,
+      'parentId': newBookmarkFolder.id.toString()
+    });
 
-  chrome.bookmarks.create({
-    'title': newBookmark.title + "link",
-    'url': "http://code.google.com/chrome/extensions",
-    'parentId': newBookmark["id"]
   });
 }
 

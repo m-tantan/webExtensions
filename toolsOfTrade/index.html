@@ -30,10 +30,28 @@
         </div>
         <br>
         <div class="form-group">
+            <label class="form-check-label hideElem" id="folderNameId">New bookmark folder name
+                <input type="text" id="folderNameInput">
+                <br>
+                <label>
+                    Into: 
+                    <label>
+                        <input class="form-check-input" type="radio" name="newFolderLocation" id="intoBookmarkBar" value="checkedValue" checked>
+                        Bookmark bar
+                    </label>
+                    <label>
+                        <input class="form-check-input" type="radio" name="newFolderLocation" id="intoOtherFolder" value="checkedValue">
+                        Other bookmarks
+                    </label>
+                </label>
+                <br>
+            </label>
+            <br>
             <label class="hideElem" for="" id="guidanceText">Input the urls seperated by commas here</label>
             <br>
             <textarea class="form-control big-box hideElem" name="UrlBox" cols="60" rows="20" id="urlInputBox" placeholder="Paste urls here"></textarea>
             <br>
+            
         </div>
 
         <div class="flex-row-container">
@@ -41,7 +59,6 @@
             <p class="flex-row-spacer-btns"></p>
             <input name="recieveUrls" id="proceedBtn" class="btn btn-primary btn-proceed" type="button" value="Proceed">
         </div>
-
     </div>
 
 </body>
