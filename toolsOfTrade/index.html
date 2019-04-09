@@ -16,8 +16,12 @@
         <!-- Select action to use URLs with -->
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue"> Open as
-                tabs
+                <input class="form-check-input" type="radio" name="actionChoice" id="idSharingBookmarks" value="checkedValue" checked>
+                Share a folder 
+            </label>
+            <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue">
+                Open as tabs
             </label>
             <label class="form-check-label">
                 <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue">
@@ -26,16 +30,16 @@
         </div>
         <br>
         <div class="form-group">
-            <label for="">Input the urls seperated by commas here</label>
+            <label class="hideElem" for="" id="guidanceText">Input the urls seperated by commas here</label>
             <br>
-            <textarea class="form-control big-box" name="UrlBox" cols="60" rows="20" id="inputBox" placeholder="Paste urls here"></textarea>
+            <textarea class="form-control big-box hideElem" name="UrlBox" cols="60" rows="20" id="urlInputBox" placeholder="Paste urls here"></textarea>
             <br>
         </div>
 
         <div class="flex-row-container">
-            <input name="cleanUrls" id="clearBtn" class="btn btn-primary btn-reset" type="button" value="Reset">
+            <input name="cleanUrls" id="clearBtn" class="btn btn-primary btn-reset" type="button" value="Clear content">
             <p class="flex-row-spacer-btns"></p>
-            <input name="recieveUrls" id="btnInput" class="btn btn-primary btn-proceed" type="button" value="Proceed">
+            <input name="recieveUrls" id="proceedBtn" class="btn btn-primary btn-proceed" type="button" value="Proceed">
         </div>
 
     </div>

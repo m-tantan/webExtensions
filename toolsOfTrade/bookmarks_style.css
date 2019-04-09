@@ -1,11 +1,16 @@
 body {
     width: 450px;
-    height: 450px;
+    height: 135px;
 }
 
 .big-box {
     line-break: normal;
     overflow: auto;
+}
+
+.hideElem{
+    visibility: hidden;
+    height: 0px;
 }
 
 .btn-proceed {

@@ -19,7 +19,8 @@
     }],
     "permissions": [
           "contextMenus",
-          "bookmarks"
+          "bookmarks", 
+          "tabs"
         ],
     "browser_action": {
         "default_icon": "content/scholarship_16.png",
