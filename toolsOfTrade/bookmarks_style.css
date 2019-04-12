@@ -55,3 +55,18 @@ ul.leaf {
     font-weight: bold;
     font-size: 1.07em;
 }
+
+.hover-folder{
+    width: auto;
+    border: 1px;
+    border-color: black;
+    border-style: dashed;
+}
+
+.click-folder{
+    width: auto;
+    border: 1px;
+    border-color: black;
+    border-style: ridge;
+}
+

@@ -208,10 +208,22 @@ function generateFolders(foldersDict){
   
   console.log(foldersDict.length);
   for (var key in foldersDict){
-    var elem = document.createElement("li");
+    let elem = document.createElement("li");
     elem.innerHTML = foldersDict[key];
+    elem.value = key;
     elem.classList.add("folder");
-    elem.onclick = copyChildrenToClipboard;
+    elem.onmouseenter = function(){
+      elem.classList.add("hover-folder")
+    };
+    elem.onmouseleave = function(){
+      elem.classList.remove("hover-folder")
+      elem.classList.remove("click-folder");
+    };
+    elem.onclick = function(ev){
+      console.log(`Getting links for folder ${this.innerHTML} this is the key: ${this.value}`);
+      elem.classList.add("click-folder");
+      chrome.bookmarks.getChildren(this.value.toString(), selectedFolderToShare);
+    };
     unorderedList.style.backgroundColor = "bisque";
     unorderedList.appendChild(elem);
   };
@@ -240,4 +252,16 @@ function copyTextToClipboard(text) {
 
 function copyChildrenToClipboard(ev){
   console.log(`clicked: ${ev}`);
+};
+
+function selectedFolderToShare(children){
+  let urlsToShareString = "";
+  for (i = 0; i < children.length; i++ ){
+    if (i < children.length - 1){
+      urlsToShareString += children[i].url + '\n';
+    }
+    else urlsToShareString += children[i].url;
+  };
+  copyChildrenToClipboard(urlsToShareString);
+  console.log(`Final string is: ${urlsToShareString}`)
 };
