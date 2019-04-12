@@ -36,14 +36,18 @@ document.addEventListener('DOMContentLoaded', function (event) {
   var radioButtons = document.getElementsByClassName("form-check-input");
   var newFolderInputText = document.getElementById("folderNameId");
   var newFolderNameInput = document.getElementById("folderNameInput");
-  var availableFoldersDiv = document.getElementById("mydiv");
-  
+  let folderDiv = document.getElementById("folderDivId");
 
   // 'Define' radio buttons 
   var shareFoldersRadio = radioButtons[0];
   var openAsTabsRadio = radioButtons[1];
   var importNewFolderFromUrlRadio = radioButtons[2];
-
+  
+  generalListOfBookmarks.forEach(cat => {
+    var catagoryAsStr = cat.toString();
+    chrome.bookmarks.get([catagoryAsStr], onFetchBookmarkSuccess);
+  });   
+  console.log(`The folders dict is: ${foldersDict.length}`);
   // Setup radio buttons' onclick
   shareFoldersRadio.onclick = function (ev) {
     mode = GET_CURRENT_BOOKMARK_FOLDERS;
@@ -53,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     newFolderInputText.classList.add("hideElem");
     newFolderNameInput.classList.add("hideElem");
     clearBtn.classList.add("hideElem");
+    folderDiv.classList.remove("hideElem");
 
     document.body.style.height = '145px';
   };
@@ -65,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     newFolderInputText.classList.add("hideElem");
     newFolderNameInput.classList.add("hideElem");
     clearBtn.classList.remove("hideElem");
+    folderDiv.classList.add("hideElem");
 
     document.body.style.height = '450px';
   };
@@ -77,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     newFolderInputText.classList.remove("hideElem");
     newFolderNameInput.classList.remove("hideElem");
     clearBtn.classList.remove("hideElem");
+    folderDiv.classList.add("hideElem");
     
     document.body.style.height = '475px';
   };
@@ -85,6 +92,14 @@ document.addEventListener('DOMContentLoaded', function (event) {
   clearBtn.onclick = function (ev) {
     console.log("Deleting textarea content");
     urlTextArea.value = "";
+  };
+
+  clearBtn.onmouseenter = function (ev) {
+    clearBtn.classList.add("clear-btn-urge");
+  };
+
+  clearBtn.onmouseleave = function (ev) {
+    clearBtn.classList.remove("clear-btn-urge");
   };
 
   bookmarkBarRadio.onclick = function (ev) {
@@ -97,16 +112,20 @@ document.addEventListener('DOMContentLoaded', function (event) {
     console.log(`Select Other bookmark folder`);
   };
 
+  proceedBtn.onmouseenter = function(ev){
+    proceedBtn.classList.add("proceed-btn-urge");
+  }
+  proceedBtn.onmouseleave = function(ev){
+    proceedBtn.classList.remove("proceed-btn-urge");
+  }
+  
   proceedBtn.onclick = function (ev) {
     console.log("Proceed btn clicked");
+    
     /* --------------------- SHARING FROM LIST OF FOLDERS --------------------------- */
     // If user wishes to open several links together
     if (mode == GET_CURRENT_BOOKMARK_FOLDERS) {
       console.log("Supposed to display all bookmarks on load");
-      generalListOfBookmarks.forEach(cat => {
-        var catagoryAsStr = cat.toString();
-        chrome.bookmarks.get([catagoryAsStr], onFetchBookmarkSuccess);
-      });   
     }
     
     
@@ -144,21 +163,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
       }
       copyTextToClipboard(urlTextArea.value);
     }
-        
-    // Used to fetch a folder / single url
-    
-    // // Used to get the children within a folder with a known Id
-    if (activated) {
-      var fetchPromiseChildren = chrome.bookmarks.getChildren("255", onFetchBookmarkSuccess);
-      var fetchPromiseFolder = chrome.bookmarks.get(["255"], onFetchBookmarkSuccess);
-      chrome.bookmarks.create({
-        'title': "Folder",
-        'index': 0,
-        'parentId': "0"
-      }, createUrlsWithinNewFolder);
-    }
   }
-  loadAllBookmarks();
 })
 
 function createUrlsWithinNewFolder(newBookmarkFolder, listOfLinks) {
@@ -174,14 +179,13 @@ function createUrlsWithinNewFolder(newBookmarkFolder, listOfLinks) {
       'url': link,
       'parentId': newBookmarkFolder.id.toString()
     });
-
   });
 }
 
 function onFetchBookmarkSuccess(bookmarks) {
   bookmarks.forEach(element => {
     console.log(element);
-    chrome.bookmarks.getChildren(element.id, onGetChildrenSuccess)
+    chrome.bookmarks.getChildren(element.id, onGetChildrenSuccess);
   });
 }
 
@@ -189,64 +193,51 @@ function onGetChildrenSuccess(children) {
   children.forEach((child) => {
     if (child.url == null) {
       console.log(`Found folder: ${child.title}`)
-      foldersDict[child.title] = child.title;
+      foldersDict[child.id] = child.title;
     }
-  })
-}
-
-function onFetchBookmarkFail(err) {
-  console.log(`Err: ${err}`);
-}
-
-function loadAllBookmarks(elemToAddTo){
-  let j = document.getElementById("mydiv");
-  console.log(`The elem is: ${elemToAddTo}`);
-  console.log(`The elem is: ${j}`);
-  
-  if (!loadedFolders){
-    // loadedFolders = true;
-    let availableFoldersDiv = document.getElementById("mydiv");
-
-    let unorderedList = document.createElement("ul");
-    unorderedList.id = "ulId";
-    availableFoldersDiv.appendChild(unorderedList);
-    loadFoldersIntoUl();
+  });
+  if(!loadedFolders){
+    loadedFolders = true;
+    generateFolders(foldersDict);
   }
 }
-
-function loadFoldersIntoUl(htmlElem){
-  let ul = document.getElementById("ulId");
-
+function generateFolders(foldersDict){
+  let availableFoldersDiv = document.getElementById("folderDivId")
+  let unorderedList = document.createElement("ul");
+  unorderedList.id = "listOfFoldersId";
+  
+  console.log(foldersDict.length);
   for (var key in foldersDict){
     var elem = document.createElement("li");
     elem.innerHTML = foldersDict[key];
     elem.classList.add("folder");
-    ul.appendChild(elem);
+    elem.onclick = copyChildrenToClipboard;
+    unorderedList.style.backgroundColor = "bisque";
+    unorderedList.appendChild(elem);
   };
+  availableFoldersDiv.appendChild(unorderedList);
 }
 
 function copyTextToClipboard(text) {
   //Create a textbox field where we can insert text to. 
   var copyFrom = document.createElement("textarea");
-
   //Set the text content to be the text you wished to copy.
   copyFrom.textContent = text;
-
   //Append the textbox field into the body as a child. 
   //"execCommand()" only works when there exists selected text, and the text is inside 
   //document.body (meaning the text is part of a valid rendered HTML element).
   document.body.appendChild(copyFrom);
-
   //Select all the text!
   copyFrom.select();
-
   //Execute command
   document.execCommand('copy');
-
   //(Optional) De-select the text using blur(). 
   copyFrom.blur();
-
   //Remove the textbox field from the document.body, so no other JavaScript nor 
   //other elements can get access to this.
   document.body.removeChild(copyFrom);
 }
+
+function copyChildrenToClipboard(ev){
+  console.log(`clicked: ${ev}`);
+};

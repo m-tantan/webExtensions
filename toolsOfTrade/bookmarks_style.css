@@ -45,3 +45,13 @@ ul.leaf {
     display: flex;
     flex: 3 1 150px;
 }
+
+.proceed-btn-urge{
+    border: 2px;
+    border-color: whitesmoke;
+    font-weight: bold;
+}
+.clear-btn-urge{
+    font-weight: bold;
+    font-size: 1.07em;
+}
