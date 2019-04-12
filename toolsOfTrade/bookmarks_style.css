@@ -3,13 +3,28 @@ body {
     height: 135px;
 }
 
+ul.leaf {
+    list-style-image: url('/content/scholarship_16.png');
+}
+
 .big-box {
     line-break: normal;
     overflow: auto;
 }
+.btn-reset {
+    display: flex;
+    width: auto;
+}
+
+.folder {
+    font-weight: bold;
+    font-size: 1.1em;
+    list-style-image: url('/content/folder_16.png');
+}
 
 .hideElem{
-    visibility: hidden;
+    display: none;
+    flex-basis: 0;
     height: 0px;
 }
 
@@ -20,11 +35,6 @@ body {
     background-color: darkblue;
     color: whitesmoke;
     text-align: center;
-}
-
-.btn-reset {
-    display: flex;
-    width: auto;
 }
 
 .flex-row-container {
