@@ -21,6 +21,8 @@ let bgPage = chrome.extension.getBackgroundPage();  // Gets the background scrip
 var tabsToOpenList = [];
 var linksToSaveList = [];
 var foldersDict = {};
+var nSelectedFolder = 0;
+var urlsToShareString = "";
 
 // Waits for the popup to load. Code goes in here
 document.addEventListener('DOMContentLoaded', function (event) {
@@ -124,14 +126,29 @@ document.addEventListener('DOMContentLoaded', function (event) {
     
     /* --------------------- SHARING FROM LIST OF FOLDERS --------------------------- */
     // If user wishes to open several links together
-    if (mode == GET_CURRENT_BOOKMARK_FOLDERS) {
+    if (mode === GET_CURRENT_BOOKMARK_FOLDERS) {
       console.log("Supposed to display all bookmarks on load");
+      let els = document.getElementsByClassName("click-folder");
+      if (els.length > 0){
+        els[0].classList.remove("click-folder");
+      }
+      if (typeof chosenId !== 'undefined'){
+        nSelectedFolder = 0;
+
+        copyTextToClipboard(urlsToShareString);
+        if (urlsToShareString.length > 0 ){
+          alert("Copied all LINKS to clipboard, Folders were ignored");
+        }
+      }
+      else{
+        alert("Please select a folder first");
+      }
     }
     
     
     /* ---------------------------- OPEN AS TABS ------------------------------------ */
     
-    else if (mode == OPEN_AS_TABS) {
+    else if (mode === OPEN_AS_TABS) {
       var unparsedUrlsToOpen = urlTextArea.value;
       var parsedUrlsToOpen = unparsedUrlsToOpen.split("\n");
       if (unparsedUrlsToOpen.length > 0) {
@@ -144,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     }
     /* ---------------------------- SAVE TO FOLDER ----------------------------------- */
     
-    else if (mode == SAVE_URLS_TO_BOOKMARK_FOLDER) { // If Create a folder was selected
+    else if (mode === SAVE_URLS_TO_BOOKMARK_FOLDER) { // If Create a folder was selected
       var unparsedUrlsToOpen = urlTextArea.value;
       if (unparsedUrlsToOpen.length > 0) {
         var parsedUrlsToOpen = unparsedUrlsToOpen.split("\n");
@@ -161,7 +178,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
           'parentId': parentFolderId.toString()
         }, createUrlsWithinNewFolder);        
       }
-      copyTextToClipboard(urlTextArea.value);
+      let target = parentFolderId == BOOKMARKS_BAR ? 'bookmarks bar' : 'other bookmarks folder';
+      alert(`${parsedUrlsToOpen.length.toString()} links were saved to a folder named ${newFolderNameInput.value.toString()} in the ${target}.`)
     }
   }
 })
@@ -217,14 +235,22 @@ function generateFolders(foldersDict){
     };
     elem.onmouseleave = function(){
       elem.classList.remove("hover-folder")
-      elem.classList.remove("click-folder");
     };
     elem.onclick = function(ev){
       console.log(`Getting links for folder ${this.innerHTML} this is the key: ${this.value}`);
-      elem.classList.add("click-folder");
-      chrome.bookmarks.getChildren(this.value.toString(), selectedFolderToShare);
+      if (nSelectedFolder == 0){
+        elem.classList.add("click-folder");
+        nSelectedFolder += 1;
+      }
+      else {
+        let els = document.getElementsByClassName("click-folder");
+        els[0].classList.remove("click-folder");
+        elem.classList.add("click-folder");
+      }
+      chosenId = this.value.toString();
+      chrome.bookmarks.getChildren(chosenId, selectedFolderToShare);
     };
-    unorderedList.style.backgroundColor = "bisque";
+    
     unorderedList.appendChild(elem);
   };
   availableFoldersDiv.appendChild(unorderedList);
@@ -250,18 +276,17 @@ function copyTextToClipboard(text) {
   document.body.removeChild(copyFrom);
 }
 
-function copyChildrenToClipboard(ev){
-  console.log(`clicked: ${ev}`);
-};
-
 function selectedFolderToShare(children){
-  let urlsToShareString = "";
+  
   for (i = 0; i < children.length; i++ ){
+    if (typeof children[i].url === 'undefined'){ //Indicates it is another folder
+      chrome.bookmarks.getChildren(children[i].id, selectedFolderToShare);
+      continue;
+    }
     if (i < children.length - 1){
       urlsToShareString += children[i].url + '\n';
     }
     else urlsToShareString += children[i].url;
   };
-  copyChildrenToClipboard(urlsToShareString);
   console.log(`Final string is: ${urlsToShareString}`)
 };
