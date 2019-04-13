@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
   var newFolderInputText = document.getElementById("folderNameId");
   var newFolderNameInput = document.getElementById("folderNameInput");
   let folderDiv = document.getElementById("folderDivId");
-
+  let shareGuidanceTxt = document.getElementById("shareGuidance");
   // 'Define' radio buttons 
   var shareFoldersRadio = radioButtons[0];
   var openAsTabsRadio = radioButtons[1];
@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     newFolderNameInput.classList.add("hideElem");
     clearBtn.classList.add("hideElem");
     folderDiv.classList.remove("hideElem");
+    shareGuidanceTxt.classList.remove("hideElem");
 
     document.body.style.height = '145px';
   };
@@ -73,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     newFolderNameInput.classList.add("hideElem");
     clearBtn.classList.remove("hideElem");
     folderDiv.classList.add("hideElem");
+    shareGuidanceTxt.classList.add("hideElem");
 
     document.body.style.height = '450px';
   };
@@ -86,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     newFolderNameInput.classList.remove("hideElem");
     clearBtn.classList.remove("hideElem");
     folderDiv.classList.add("hideElem");
+    shareGuidanceTxt.classList.add("hideElem");
     
     document.body.style.height = '475px';
   };
@@ -137,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
         copyTextToClipboard(urlsToShareString);
         if (urlsToShareString.length > 0 ){
-          alert("Copied all LINKS to clipboard, Folders were ignored");
+          alert("Copied all LINKS to clipboard\n(bookmarks within folders included)");
         }
       }
       else{
@@ -158,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
           chrome.tabs.create({ 'url': website });
         }
       }
+      else alert("Please input at least one url");
     }
     /* ---------------------------- SAVE TO FOLDER ----------------------------------- */
     
@@ -177,9 +181,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
           'index': 0,
           'parentId': parentFolderId.toString()
         }, createUrlsWithinNewFolder);        
+        let target = parentFolderId == BOOKMARKS_BAR ? 'bookmarks bar' : 'other bookmarks folder';
+        alert(`${parsedUrlsToOpen.length.toString()} links were saved to a folder named ${newFolderNameInput.value.toString()} in the ${target}.`);
       }
-      let target = parentFolderId == BOOKMARKS_BAR ? 'bookmarks bar' : 'other bookmarks folder';
-      alert(`${parsedUrlsToOpen.length.toString()} links were saved to a folder named ${newFolderNameInput.value.toString()} in the ${target}.`)
+      else alert("Please input at least one url");
+        
+      
     }
   }
 })

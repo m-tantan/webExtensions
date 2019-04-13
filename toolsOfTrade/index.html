@@ -11,7 +11,7 @@
 <body>
     <div class="container">
 
-        <h1 class="display-1">Sharing is caring</h1>
+        <h1 class="display-1">Share your bookmarks</h1>
 
         <!-- Select action to use URLs with -->
         <div class="form-check">
@@ -21,18 +21,19 @@
             </label>
             <label class="form-check-label">
                 <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue">
-                Open as tabs
+                Open links as tabs
             </label>
             <label class="form-check-label">
                 <input class="form-check-input" type="radio" name="actionChoice" id="" value="checkedValue">
-                Save as bookmark folder
+                Save links as a bookmark folder
             </label>
         </div>
         <br>
+        <p id="shareGuidance">Select a folder to share and click proceed.</p>
         <div id="folderDivId"></div>
         <div class="form-group">
             <label class="form-check-label hideElem" id="folderNameId">New bookmark folder name
-                <input type="text" id="folderNameInput">
+                <input type="text" id="folderNameInput"> (optional)
                 <br>
                 <label>
                     Into: 
