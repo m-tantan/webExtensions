@@ -32,6 +32,7 @@ ul.leaf {
     display: flex;
     width: auto;
     position: relative;
+    margin-bottom: 5px;
     background-color: darkblue;
     color: whitesmoke;
     text-align: center;
